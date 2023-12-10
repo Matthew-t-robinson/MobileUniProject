@@ -25,8 +25,8 @@ public class Player extends Entity{
 
     private float airSpeed = 0f;
     private float gravity = 0.2f * GAME_SCALE;
-    private float jumpSpeed = -5.2f * GAME_SCALE;
-    private float fallSpeedAfterCollision = 0.5f * GAME_SCALE;
+    private float jumpSpeed = -10.2f * GAME_SCALE;
+    private final float fallSpeedAfterCollision = 0.5f * GAME_SCALE;
     private boolean inAir = false;
     private boolean jumpingAnim;
 
@@ -132,6 +132,12 @@ public class Player extends Entity{
                 hitbox.top += airSpeed;
                 hitbox.bottom += airSpeed;
                 airSpeed += gravity;
+                float maxAirSpeed = 16;
+                float minAirSpeed = -16;
+                if (airSpeed < minAirSpeed)
+                    airSpeed = minAirSpeed;
+                if (airSpeed > maxAirSpeed)
+                    airSpeed = maxAirSpeed;
                 updateXpos(xSpeed);
             }
             else {

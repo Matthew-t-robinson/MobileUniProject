@@ -14,18 +14,16 @@ public class levelManager {
     private Bitmap levelSprite;
     private static Level levelOne =  new Level(LEVEL_ONE);
     private static Level levelTwo = new Level(LEVEL_TWO);
-    public static Level currentLevel = levelOne;
-    public static int lvlNumber = ONE;
-    public static int endLvlNumber = TWO;
-    private GamePanel gameView;
-
-    private Game game;
-    private Playing playing;
+    private static Level levelThree = new Level(LEVEL_THREE);
+    public static Level currentLevel = levelThree;
+    public static int lvlNumber = THREE;
+    public static int endLvlNumber = THREE;
+    private final Game game;
+    private final Playing playing;
 
 
     public levelManager (Playing playing, Game game){
         this.game = game;
-        currentLevel = levelOne;
         this.playing = playing;
     }
 
@@ -40,7 +38,7 @@ public class levelManager {
 
     public void nextLevel(){
         lvlNumber += 1;
-        if (lvlNumber <= 2){
+        if (lvlNumber <= endLvlNumber){
             setLevel(lvlNumber);
         }
     }
@@ -53,6 +51,9 @@ public class levelManager {
                 break;
             case TWO:
                 currentLevel = levelTwo;
+                break;
+            case THREE:
+                currentLevel = levelThree;
                 break;
             default:
                 game.setCurrentGameState(Game.GameState.MENU);

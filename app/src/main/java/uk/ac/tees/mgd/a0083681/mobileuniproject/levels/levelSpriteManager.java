@@ -8,7 +8,6 @@ import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.Obj
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.PointF;
 
 import java.util.ArrayList;
@@ -19,26 +18,26 @@ import uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.R;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.BitmapMethods;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.objects.Chest;
-import uk.ac.tees.mgd.a0083681.mobileuniproject.objects.GameObject;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.objects.Spikes;
 
 public enum levelSpriteManager implements BitmapMethods {
-    LEVEL_ONE(R.drawable.outside_sprites,12, 4, R.drawable.level_three, R.drawable.bg_image),
-    LEVEL_TWO(R.drawable.outside_sprites,12, 4, R.drawable.level_two, R.drawable.bg_image);
+    LEVEL_ONE(R.drawable.outside_sprites,12, 4, R.drawable.level_one, R.drawable.bg_image),
+    LEVEL_TWO(R.drawable.outside_sprites,12, 4, R.drawable.level_two, R.drawable.bg_image),
+    LEVEL_THREE(R.drawable.outside_sprites,12, 4, R.drawable.level_three, R.drawable.bg_image);
 
     private final Bitmap[] sprites;
     private final Bitmap lvlDataBitmap;
     private final Bitmap lvlBackground;
 
-    levelSpriteManager(int resID, int spritesheetWidth, int spritesheetHeight, int lvlDataResId, int lvlBackgroundResId){
+    levelSpriteManager(int resID, int spriteSheetWidth, int spriteSheetHeight, int lvlDataResId, int lvlBackgroundResId){
         options.inScaled = false;
-        sprites = new Bitmap[spritesheetHeight * spritesheetWidth];
+        sprites = new Bitmap[spriteSheetHeight * spriteSheetWidth];
         lvlDataBitmap = BitmapFactory.decodeResource(MainActivity.getGameContext().getResources(), lvlDataResId, options);
         lvlBackground = getScaledBitmap(BitmapFactory.decodeResource(MainActivity.getGameContext().getResources(), lvlBackgroundResId, options),10);
         Bitmap spriteSheet = BitmapFactory.decodeResource(MainActivity.getGameContext().getResources(), resID, options);
-        for (int j = 0; j < spritesheetHeight; j++)
-            for (int i = 0; i < spritesheetWidth; i++) {
-                int index = j * spritesheetWidth + i;
+        for (int j = 0; j < spriteSheetHeight; j++)
+            for (int i = 0; i < spriteSheetWidth; i++) {
+                int index = j * spriteSheetWidth + i;
                 sprites[index] = getScaledBitmap(Bitmap.createBitmap(spriteSheet, 32 * i, 32 * j, 32, 32), GAME_SCALE);
             }
     }
