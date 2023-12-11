@@ -1,6 +1,7 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.helpers;
 
 import static android.content.Context.TELECOM_SERVICE;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.TILES_SIZE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_HEIGHT;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_WIDTH;
 
@@ -11,21 +12,11 @@ import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.CustomButton;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.Player;
 
 public class HelpMethods {
-    public static boolean CanMoveHere(float x, float y, float width, float height, int [][] lvlData, boolean crab){
-        if (crab)
-            System.out.println("here 1");
+    public static boolean CanMoveHere(float x, float y, float width, float height, int [][] lvlData){
         if (!IsSolid(x, y, lvlData)) {
-            if (crab)
-                System.out.println("here 2");
             if (!IsSolid(x + width, y + height, lvlData)) {
-                if (crab)
-                    System.out.println("here 3");
                 if (!IsSolid(x + width, y, lvlData)) {
-                    if (crab)
-                        System.out.println("here 4");
                     if (!IsSolid(x, y + height, lvlData)) {
-                        if (crab)
-                            System.out.println("here 5");
                         return true;
                     }
                 }
@@ -36,13 +27,13 @@ public class HelpMethods {
     }
 
     private static boolean IsSolid(float x, float y, int[][] lvlData) {
-        int maxWidth = lvlData[0].length * 96;
+        int maxWidth = lvlData[0].length * TILES_SIZE;
         if (x < 0 || x >= maxWidth)
             return true;
         if (y < 0 || y >= GAME_HEIGHT)
             return true;
-        float xIndex = x / 96;
-        float yIndex = y / 96;
+        float xIndex = x / TILES_SIZE;
+        float yIndex = y / TILES_SIZE;
 
         return IsTileSolid((int)xIndex, (int)yIndex, lvlData);
     }
@@ -56,27 +47,27 @@ public class HelpMethods {
     }
 
     public static float GetEntityXPosNextToWall(RectF hitbox, float xSpeed){
-        int currentTile = (int) (hitbox.left / 96);
+        int currentTile = (int) (hitbox.left / TILES_SIZE);
         if (xSpeed > 0) {
             // Right
-            int tileXPos = currentTile * 96;
-            int xOffset = (int) (96 - hitbox.width());
+            int tileXPos = currentTile * TILES_SIZE;
+            int xOffset = (int) (TILES_SIZE - hitbox.width());
             return tileXPos + xOffset - 1;
         } else
             // Left
-            return currentTile * 96;
+            return currentTile * TILES_SIZE;
     }
 
     public static float GetEntityYPosUnderRoofOrAboveFloor(RectF hitbox, float airSpeed) {
-        int currentTile = (int) (hitbox.top / 96);
+        int currentTile = (int) (hitbox.top / TILES_SIZE);
         if (airSpeed > 0) {
             // Falling - touching floor
-            int tileYPos = currentTile * 96;
-            int yOffset = (int) (96 - hitbox.height());
+            int tileYPos = currentTile * TILES_SIZE;
+            int yOffset = (int) (TILES_SIZE - hitbox.height());
             return tileYPos + yOffset;
         } else
             // Jumping
-            return currentTile * 96;
+            return currentTile * TILES_SIZE;
     }
 
     public static boolean IsEntityOnFloor(RectF hitbox, int[][] lvlData) {
@@ -109,8 +100,8 @@ public class HelpMethods {
     }
 
     public static boolean IsSightClear(int[][] lvlData, RectF hitbox, RectF hitbox2,int yTile){
-        int firstXTile = (int)hitbox.left / 96;
-        int secondXTile = (int)hitbox2.left / 96;
+        int firstXTile = (int)hitbox.left / TILES_SIZE;
+        int secondXTile = (int)hitbox2.left / TILES_SIZE;
         if (firstXTile > secondXTile)
             return IsAllTilesWalkable(secondXTile,firstXTile,yTile,lvlData);
         else

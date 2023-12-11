@@ -13,50 +13,9 @@ public class Starfish extends Enemy{
         initAttackBox(x,y, (int) 40 * GAME_SCALE,(int) 21 * GAME_SCALE, 13);
     }
 
-    public void resetEnemy() {
-        hitbox.left = x;
-        hitbox.top = y;
-        hitbox.right = x + STARFISH_WIDTH;
-        hitbox.bottom = y + STARFISH_HEIGHT;
-        super.resetEnemy();
-    }
-
-    public void update(int[][] lvlData, double delta, Player player){
-        if (!stunned) {
-            updateBehaviour(lvlData, delta, player);
-            updateAnimation();
-            updateAttackBox();
-        }
-    }
-    private void updateBehaviour(int[][] lvlData, double delta, Player player) {
-
-        if (firstUpdate)
-            firstUpdateCheck(lvlData);
-        if (inAir){
-            updateInAir(lvlData);
-        }else{
-            switch (enemyState){
-                case IDLE:
-                    newState(RUNNING);
-                    break;
-                case RUNNING:
-                    if (canSeePlayer(lvlData, player)) {
-                        turnTowardsPlayer(player);
-                        if (isPlayerCloseForAttack(player))
-                            newState(ATTACK);
-                    }
-                    move(lvlData);
-                    break;
-                case ATTACK:
-                    if (aniIndex == 0)
-                        attackChecked = false;
-                    if (aniIndex >= 3 && !attackChecked)
-                        checkEnemyHit(attackBox, player);
-                    break;
-                case HIT:
-                    break;
-
-            }
-        }
+    @Override
+    protected void checkEnemyHit(RectF attackBox, Player player) {
+        if (aniIndex >= 3 && !attackChecked)
+            super.checkEnemyHit(attackBox, player);
     }
 }

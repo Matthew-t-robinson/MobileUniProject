@@ -11,11 +11,8 @@ import android.graphics.RectF;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates.Playing;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.BitmapMethods;
 
-public class Player extends Entity{
-    private int aniTick, aniSpeed = 10;
-    private int action, aniIndex;
-
-    private boolean facingLeft;
+public class Player extends Character {
+    private int aniSpeed = 10;
     private boolean moving = false, attacking = false;
     private boolean left, right, jump;
     private int[][] lvlData;
@@ -27,28 +24,16 @@ public class Player extends Entity{
     private float gravity = 0.2f * GAME_SCALE;
     private float jumpSpeed = -10.2f * GAME_SCALE;
     private final float fallSpeedAfterCollision = 0.5f * GAME_SCALE;
-    private boolean inAir = false;
     private boolean jumpingAnim;
-
-    private int maxHealth = 100;
-    private int currentHealth = maxHealth;
-
-    private RectF attackBox;
     private boolean attackChecked;
-
     private Playing playing;
-    private boolean firstUpdate = true;
     public boolean shakeAttacking;
 
     public Player(float x, float y, int height, int width, Playing playing) {
-        super(x, y, height, width);
+        super(x, y, height, width, 100);
         this.playing = playing;
-        initHitbox(x,y,20*GAME_SCALE,27*GAME_SCALE);
-        initAttackbox(x,y,20*GAME_SCALE,20*GAME_SCALE);
-    }
-
-    protected void initAttackbox(float x, float y, float width, float height) {
-        attackBox = new RectF(x,y,x + width,y + height);
+        initHitbox(x,y,PLAYER_HITBOX_WIDTH,PLAYER_HITBOX_HEIGHT);
+        initAttackbox(x,y,PLAYER_HITBOX_WIDTH,PLAYER_HITBOX_WIDTH);
     }
 
     public void update(double delta) {
@@ -90,15 +75,15 @@ public class Player extends Entity{
         if (aniTick >= aniSpeed) {
             aniTick = 0;
             aniIndex++;
-            if (aniIndex >= GetSpriteAmount(action) && !jumpingAnim) {
+            if (aniIndex >= GetSpriteAmount(state) && !jumpingAnim) {
                 aniIndex = 0;
                 attacking = false;
                 attackChecked = false;
                 shakeAttacking = false;
-                if (action == DEAD_GROUND)
+                if (state == DEAD_GROUND)
                     playing.setGameOver(true);
             }
-            else if (jumpingAnim && aniIndex >= GetSpriteAmount(action))
+            else if (jumpingAnim && aniIndex >= GetSpriteAmount(state))
             {
                 aniIndex--;
             }
@@ -128,7 +113,7 @@ public class Player extends Entity{
         }
 
         if (inAir){
-            if (CanMoveHere(hitbox.left,hitbox.top + airSpeed, hitbox.width(), hitbox.height(), lvlData, false)){
+            if (CanMoveHere(hitbox.left,hitbox.top + airSpeed, hitbox.width(), hitbox.height(), lvlData)){
                 hitbox.top += airSpeed;
                 hitbox.bottom += airSpeed;
                 airSpeed += gravity;
@@ -171,7 +156,7 @@ public class Player extends Entity{
     public void render(Canvas c, int xLvlOffset){
         //drawHitbox(c, xLvlOffset);
         //drawAttackBox(c,xLvlOffset);
-        c.drawBitmap(BitmapMethods.createFlippedBitmap(entitySpriteManager.PLAYER.getSprite(getAction(), getAniIndex()), isFacingLeft(), false), getHitbox().left - xDrawOffset - xLvlOffset,getHitbox().top - yDrawOffset, null);
+        c.drawBitmap(BitmapMethods.createFlippedBitmap(entitySpriteManager.PLAYER.getSprite(getState(), getAniIndex()), isFacingLeft(), false), getHitbox().left - xDrawOffset - xLvlOffset,getHitbox().top - yDrawOffset, null);
     }
 
     private void drawAttackBox(Canvas c, int xLvlOffset) {
@@ -191,7 +176,7 @@ public class Player extends Entity{
     }
 
     private void updateXpos(double xSpeed) {
-        if (CanMoveHere(hitbox.left+(float)xSpeed, hitbox.top, hitbox.width(), hitbox.height(), lvlData, false)) {
+        if (CanMoveHere(hitbox.left+(float)xSpeed, hitbox.top, hitbox.width(), hitbox.height(), lvlData)) {
             hitbox.left += xSpeed;
             hitbox.right += xSpeed;
         }else{
@@ -207,31 +192,31 @@ public class Player extends Entity{
     }
 
     public void setPlayerAnim (){
-        int currentAnim = action;
+        int currentAnim = state;
         if (moving) {
-            action = RUNNING;
+            state = RUNNING;
         } else {
-            action = IDLE;
+            state = IDLE;
         }
         if (inAir) {
             if (airSpeed < 0) {
-                action = JUMP;
+                state = JUMP;
                 jumpingAnim = true;
             } else {
-                action = FALLING;
+                state = FALLING;
                 jumpingAnim = false;
             }
         }
         if (attacking) {
-            action = ATTACK_1;
+            state = ATTACK_1;
         }
         if (currentHealth == 0)
-            action = DEAD_GROUND;
+            state = DEAD_GROUND;
         if (shakeAttacking){
-            action = SHAKE_ATTACK;
+            state = SHAKE_ATTACK;
         }
 
-        if (action != currentAnim) {
+        if (state != currentAnim) {
             resetAnim();
         }
     }
@@ -255,16 +240,12 @@ public class Player extends Entity{
         this.attacking = attacking;
     }
 
-    public int getAction(){
-        return action;
+    public int getState(){
+        return state;
     }
 
     public int getAniIndex() {
         return aniIndex;
-    }
-
-    public boolean isLeft() {
-        return left;
     }
 
     public void setLeft(boolean left) {
@@ -281,20 +262,8 @@ public class Player extends Entity{
         }
     }
 
-    public boolean isFacingLeft() {
-        return facingLeft;
-    }
-
-    public void setFacingLeft(boolean facingLeft) {
-        this.facingLeft = facingLeft;
-    }
-
     public void setJump(boolean jump) {
         this.jump = jump;
-    }
-
-    public int getCurrentHealth() {
-        return currentHealth;
     }
 
     public void changeHealth(int value) {
@@ -316,21 +285,13 @@ public class Player extends Entity{
         inAir = false;
         attacking = false;
         moving = false;
-        firstUpdate = true;
-        action = IDLE;
-        currentHealth = maxHealth;
-
-        hitbox.left = x;
-        hitbox.top = y;
-        hitbox.right = hitbox.left + 20*GAME_SCALE;
-        hitbox.bottom = hitbox.top + 27*GAME_SCALE;
-
+        super.resetAll();
         if (!IsEntityOnFloor(hitbox, lvlData))
             inAir = true;
     }
 
     public void setSpawn(){
-        PointF spawnPoint = playing.getLvlManager().getCurrentLevel().getLevel().GetPlayerSpawn();
+        PointF spawnPoint = playing.getLvlManager().getCurrentLevel().getLevel().getPlayerStartPos();
         this.x = spawnPoint.x;
         this.y = spawnPoint.y;
         resetAll();
@@ -344,11 +305,6 @@ public class Player extends Entity{
         if (aniIndex != 1)
             return;
         playing.shakeAttack(attackBox);
-    }
-
-    private boolean isEnemyInRange(Enemy enemy) {
-        int absValue = (int)Math.abs(enemy.hitbox.left - hitbox.left);
-        return absValue <= 96 * 2;
     }
 
     public RectF getAttackBox() {

@@ -29,8 +29,8 @@ public class EnemyManager {
     }
 
     public void addEnemies() {
-        crabs = playing.getLvlManager().currentLevel.getLevel().GetCrabs();
-        starfish = playing.getLvlManager().currentLevel.getLevel().GetStarfish();
+        crabs = playing.getLvlManager().currentLevel.getLevel().getCrabsList();
+        starfish = playing.getLvlManager().currentLevel.getLevel().getStarfishList();
         //System.out.println("Size of crabs:" + crabs.size());
     }
 
@@ -56,7 +56,7 @@ public class EnemyManager {
                 //currentCrab.drawHitbox(c, xLvlOffset);
                 //currentCrab.drawAttackBox(c, xLvlOffset);
                 c.drawBitmap(
-                        BitmapMethods.createFlippedBitmap(Crab.getSprite(currentCrab.getEnemyState(), currentCrab.getAniIndex()), currentCrab.isFacingRight(), false),
+                        BitmapMethods.createFlippedBitmap(Crab.getSprite(currentCrab.getState(), currentCrab.getAniIndex()), !currentCrab.isFacingLeft(), false),
                         currentCrab.getHitbox().left - xLvlOffset - CRAB_DRAWOFFSET_X, currentCrab.getHitbox().top - CRAB_DRAWOFFSET_Y, null);
             }
         }
@@ -68,7 +68,7 @@ public class EnemyManager {
                // s.drawHitbox(c, xLvlOffset);
                //s.drawAttackBox(c, xLvlOffset);
                 c.drawBitmap(
-                        BitmapMethods.createFlippedBitmap(Starfish.getSprite(s.getEnemyState(), s.getAniIndex()), s.isFacingRight(), false),
+                        BitmapMethods.createFlippedBitmap(Starfish.getSprite(s.getState(), s.getAniIndex()), !s.isFacingLeft(), false),
                         s.getHitbox().left - xLvlOffset - STARFISH_DRAWOFFSET_X, s.getHitbox().top - STARFISH_DRAWOFFSET_Y, null);
             }
         }
@@ -76,9 +76,9 @@ public class EnemyManager {
 
     public void resetAllEnemies() {
         for (Crab c : crabs)
-            c.resetEnemy();
+            c.resetAll();
         for (Starfish s : starfish)
-            s.resetEnemy();
+            s.resetAll();
     }
 
     public void checkEnemyHit(RectF attackBox){
@@ -114,7 +114,7 @@ public class EnemyManager {
     public void stunTimer(){
         if (!Stunning) {
             Stunning = true;
-            CountDownTimer time = new CountDownTimer(6000, 1000) {
+            CountDownTimer time = new CountDownTimer(2500, 1000) {
                 public void onTick(long millisUntilFinished) {
                     for (Crab c : crabs) {
                         if (c.isAlive() && c.isActive())

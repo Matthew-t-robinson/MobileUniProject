@@ -8,38 +8,35 @@ import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.GetEn
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.IsEntityOnFloor;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.IsFloor;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.IsSightClear;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.GamePanel.TILES_SIZE;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
-public abstract class Enemy extends Entity{
-    protected int aniIndex, enemyState, enemyType;
-    protected int aniTick, aniSpeed = 8;
-    protected boolean firstUpdate = true;
-    protected boolean facingRight;
-    protected boolean inAir;
+public abstract class Enemy extends Character {
+    protected int enemyType;
+    protected int aniSpeed = 8;
     protected float fallSpeed;
     protected float gravity = 0.2f * GAME_SCALE;
     protected int walkDir = LEFT;
     protected int tileY;
-    protected float attackDistance = 96;
-    protected int maxHealth, currentHealth;
+    protected float attackDistance = TILES_SIZE;
     protected boolean active = true;
-    protected boolean attackChecked;
     protected boolean stunned = false;
-    protected RectF attackBox;
     protected int attackBoxOffsetX;
 
     public Enemy(float x, float y, int Height, int Width, int enemyType) {
-        super(x, y, Height, Width);
+        super(x, y, Height, Width, enemyType);
         this.enemyType = enemyType;
-        maxHealth = GetMaxHealth(enemyType);
-        currentHealth = maxHealth;
+    }
+
+    public void update(int[][] lvlData, double delta, Player player){
+        updateBehaviour(lvlData, delta, player);
+        updateAnimation();
+        updateAttackBox();
     }
 
     protected void updateInAir(int[][] lvlData){
-        if (CanMoveHere(hitbox.left,hitbox.top + fallSpeed,hitbox.width(),hitbox.height(),lvlData, false)) {
+        if (CanMoveHere(hitbox.left,hitbox.top + fallSpeed,hitbox.width(),hitbox.height(),lvlData)) {
             hitbox.top += fallSpeed;
             hitbox.bottom += fallSpeed;
             fallSpeed += gravity;
@@ -64,8 +61,8 @@ public abstract class Enemy extends Entity{
         c.drawRect(attackBox.left - xLvlOffset, attackBox.top,attackBox.right - xLvlOffset, attackBox.bottom,redpaint);
     }
 
-    protected void newState(int enemyState) {
-        this.enemyState = enemyState;
+    protected void newState(int state) {
+        this.state = state;
         aniTick = 0;
         aniIndex = 0;
     }
@@ -78,7 +75,7 @@ public abstract class Enemy extends Entity{
         else
             xSpeed = 5;
 
-        if (CanMoveHere(hitbox.left + xSpeed, hitbox.top - 2, hitbox.width(), hitbox.height(), lvlData, false))
+        if (CanMoveHere(hitbox.left + xSpeed, hitbox.top - 2, hitbox.width(), hitbox.height(), lvlData))
             if (IsFloor(hitbox, xSpeed, lvlData)) {
                 hitbox.left += xSpeed;
                 hitbox.right += xSpeed;
@@ -90,11 +87,11 @@ public abstract class Enemy extends Entity{
     protected void turnTowardsPlayer(Player player){
         if (player.hitbox.left > hitbox.right) {
             walkDir = RIGHT;
-            facingRight = true;
+            facingLeft = false;
         }
         else if (player.hitbox.right < hitbox.left){
             walkDir = LEFT;
-            facingRight = false;
+            facingLeft = true;
         }
     }
 
@@ -127,15 +124,15 @@ public abstract class Enemy extends Entity{
     protected void changeWalkDir() {
         if (walkDir == LEFT){
             walkDir = RIGHT;
-            facingRight = true;
+            facingLeft = false;
         }else{
             walkDir = LEFT;
-            facingRight = false;
+            facingLeft = true;
         }
     }
 
     protected void updateAnimation(){
-        if (stunned && enemyState != HIT)
+        if (stunned && state != HIT)
             return;
         aniTick++;
         if (aniTick >= aniSpeed) {
@@ -143,13 +140,13 @@ public abstract class Enemy extends Entity{
             aniIndex++;
             if (aniIndex >= GetSpriteAmount(enemyType, aniIndex)) {
                 aniIndex = 0;
-                switch (enemyState){
+                switch (state){
                     case IDLE:
-                        enemyState = RUNNING;
+                        state = RUNNING;
                         break;
                     case ATTACK:
                     case HIT:
-                        enemyState = IDLE;
+                        state = IDLE;
                         break;
                     case DEAD:
                         active = false;
@@ -163,21 +160,15 @@ public abstract class Enemy extends Entity{
         return aniIndex;
     }
 
-    public int getEnemyState() {
-        return enemyState;
+    public int getState() {
+        return state;
     }
 
-    public boolean isFacingRight() {
-        return facingRight;
-    }
-
-    public void resetEnemy() {
-        firstUpdate = true;
-        currentHealth = maxHealth;
-        newState(IDLE);
+    public void resetAll() {
         active = true;
         fallSpeed = 0;
         stunned = false;
+        super.resetAll();
     }
 
     public void damage(int amount) {
@@ -213,12 +204,43 @@ public abstract class Enemy extends Entity{
     }
 
     protected void initAttackBox(float x, float y, float width, float height, int xOffset) {
-        attackBox = new RectF(x,y,x + width,y + height);
+        super.initAttackbox(x,y,width,height);
         attackBoxOffsetX = (int)(GAME_SCALE *  xOffset);
     }
 
     public boolean isAlive(){
-        return enemyState != DEAD || stunned;
+        return state != DEAD || stunned;
+    }
+
+    void updateBehaviour(int[][] lvlData, double delta, Player player) {
+
+        if (firstUpdate)
+            firstUpdateCheck(lvlData);
+        if (inAir){
+            updateInAir(lvlData);
+        }else{
+            switch (state){
+                case IDLE:
+                    newState(RUNNING);
+                    break;
+                case RUNNING:
+                    if (canSeePlayer(lvlData, player)) {
+                        turnTowardsPlayer(player);
+                        if (isPlayerCloseForAttack(player))
+                            newState(ATTACK);
+                    }
+                    move(lvlData);
+                    break;
+                case ATTACK:
+                    if (aniIndex == 0)
+                        attackChecked = false;
+                    checkEnemyHit(attackBox, player);
+                    break;
+                case HIT:
+                    break;
+
+            }
+        }
     }
 }
 

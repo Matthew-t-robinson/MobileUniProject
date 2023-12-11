@@ -6,6 +6,7 @@ public class GameConstants {
 
     public static class AllConstants{
         public static final int GAME_SCALE = 3;
+        public static final int TILES_SIZE = 96;
     }
 
     public static class LevelConstants{
@@ -24,8 +25,8 @@ public class GameConstants {
         public static final int HIT = 3;
         public static final int DEAD = 4;
 
-        public static final int CRABBY_WIDTH = (int) (26 * GAME_SCALE);
-        public static final int CRABBY_HEIGHT = (int) (19 * GAME_SCALE);
+        public static final int CRAB_WIDTH = (int) (26 * GAME_SCALE);
+        public static final int CRAB_HEIGHT = (int) (19 * GAME_SCALE);
         public static int CRAB_DRAWOFFSET_X = (int) 26 * GAME_SCALE;
         public static int CRAB_DRAWOFFSET_Y = (int) 9 * GAME_SCALE;
 
@@ -75,8 +76,10 @@ public class GameConstants {
             switch (enemy_type){
                 case CRAB:
                     return 10;
+                case STARFISH:
+                    return 15;
                 default:
-                    return 1;
+                    return 100;
             }
         }
 
@@ -113,7 +116,10 @@ public class GameConstants {
 
     public static class PlayerConstants {
 
+        public static final int PLAYER_HITBOX_WIDTH = 20*GAME_SCALE;
+        public static final int PLAYER_HITBOX_HEIGHT = 27*GAME_SCALE;
 
+        public static final int PLAYER = 100;
         public static final int IDLE = 0;
         public static final int RUNNING = 1;
         public static final int JUMP = 2;

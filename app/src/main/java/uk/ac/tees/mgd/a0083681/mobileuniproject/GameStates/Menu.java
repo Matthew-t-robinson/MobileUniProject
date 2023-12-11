@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.CustomButton;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.GameStateInterface;
+import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.levelSpriteManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.main.Game;
 
 
@@ -62,6 +63,7 @@ public class Menu extends BaseState implements GameStateInterface {
     }
 
     private void drawUI(Canvas c) {
+        c.drawBitmap(levelSpriteManager.LEVEL_TILE_SPRITES.getLvlBackground(), 0,0, null);
         c.drawBitmap(menuButtonBackground, menuX,menuY, null);
         btnPlay.render(c);
         btnQuit.render(c);

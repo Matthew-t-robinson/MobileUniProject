@@ -3,11 +3,11 @@ package uk.ac.tees.mgd.a0083681.mobileuniproject.levels;
 public class Level {
 
     private int[][] lvlData;
-    private levelSpriteManager level;
+    private LoadLevelManager level;
 
-    public Level(levelSpriteManager level) {
-        this.lvlData = level.GetLevelData();
+    public Level(LoadLevelManager level) {
         this.level = level;
+        this.lvlData = level.getLvlData();
     }
 
     public int getSpriteIndex(int x, int y) {
@@ -18,7 +18,7 @@ public class Level {
         return lvlData;
     }
 
-    public levelSpriteManager getLevel() {
+    public LoadLevelManager getLevel() {
         return level;
     }
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates.Playing;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.Player;
+import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.LoadLevelManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.levelManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.levelSpriteManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.entitySpriteManager;
@@ -23,9 +24,9 @@ public class ObjectManager {
         loadObjects(levelManager.currentLevel.getLevel());
     }
 
-    public void loadObjects(levelSpriteManager currentLevel){
-        Chests = currentLevel.GetChest();
-        Spikes = currentLevel.GetSpikes();
+    public void loadObjects(LoadLevelManager currentLevel){
+        Chests = currentLevel.getChestList();
+        Spikes = currentLevel.getSpikesList();
     }
 
     public void update(){

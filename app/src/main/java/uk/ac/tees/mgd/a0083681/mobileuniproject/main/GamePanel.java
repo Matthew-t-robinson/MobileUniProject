@@ -1,5 +1,6 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.main;
 
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.TILES_SIZE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_HEIGHT;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_WIDTH;
 
@@ -15,7 +16,7 @@ import androidx.annotation.NonNull;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
-    public static int TILES_IN_HEIGHT, TILES_IN_WIDTH, TILES_SIZE;
+    public static int TILES_IN_HEIGHT, TILES_IN_WIDTH;
     private  GameLoop gameLoop;
     private final Game game;
 
@@ -25,7 +26,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         surfaceHolder.addCallback(this);
         game = new Game(surfaceHolder);
 
-        TILES_SIZE = 96;
+
         TILES_IN_HEIGHT = (GAME_HEIGHT / TILES_SIZE) + 1;
         TILES_IN_WIDTH = (GAME_WIDTH / TILES_SIZE) + 1;
 
