@@ -23,11 +23,13 @@ public enum UIImages implements BitmapMethods {
     PAUSE_BUTTONS(R.drawable.urm_buttons,56, 56, 3, 3, 2),
     GAMEOVER_BACKGROUND(R.drawable.death_screen,235, 225, 1,1, GAME_SCALE),
     LEVEL_COMPLETE_BACKGROUND(R.drawable.completed_sprite,224,204,1,1,GAME_SCALE),
-    GAME_COMPLETE_BACKGROUND(R.drawable.game_completed,258,258,1,1,GAME_SCALE);
+    GAME_COMPLETE_BACKGROUND(R.drawable.game_completed,258,258,1,1,GAME_SCALE),
+    CONTROLS_OVERLAY(R.drawable.controls,234,227,1,1,GAME_SCALE),
+    BUTTON_ESCAPE(R.drawable.escape_button,42,42,2,1,GAME_SCALE);
 
-    private int width, height;
-    private Bitmap spriteSheet;
-    private Bitmap[][] sprites;
+    private final int width,  height;
+    private final Bitmap spriteSheet;
+    private final Bitmap[][] sprites;
     private BitmapFactory.Options options = new BitmapFactory.Options();
     UIImages(int resId, int width, int height, int spritesheetWidth, int spritesheetHeight, int scale) {
         sprites = new Bitmap[spritesheetHeight][spritesheetWidth];

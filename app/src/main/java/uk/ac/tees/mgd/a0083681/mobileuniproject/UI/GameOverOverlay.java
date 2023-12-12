@@ -4,7 +4,6 @@ import static uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages.GAMEOVER_BACK
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages.PAUSE_BUTTONS;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.BACKTOMAINMENU;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.RESTART;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.UNPAUSE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.isIn;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_HEIGHT;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_WIDTH;
@@ -44,8 +43,8 @@ public class GameOverOverlay {
     public void draw(Canvas c){
         c.drawRect(0,0,GAME_WIDTH, GAME_HEIGHT, blackPaint);
         c.drawBitmap(GAMEOVER_BACKGROUND.getSpriteSheet(), bgX,bgY, null);
-        MainMenu.render(c);
-        Restart.render(c);
+        MainMenu.draw(c);
+        Restart.draw(c);
     }
 
     public void touchEvents(PointF eventPos, int action, int pointerId) {

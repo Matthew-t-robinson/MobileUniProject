@@ -35,7 +35,7 @@ public class CustomButton {
         }
     }
 
-    public void render(Canvas c){
+    public void draw(Canvas c){
         c.drawBitmap(
                 buttonImage.getSprite(buttonNumber, animFrame),
                 getHitbox().left,

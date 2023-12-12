@@ -3,7 +3,6 @@ package uk.ac.tees.mgd.a0083681.mobileuniproject.UI;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages.LEVEL_COMPLETE_BACKGROUND;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages.PAUSE_BUTTONS;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.BACKTOMAINMENU;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.RESTART;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.UNPAUSE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.isIn;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_HEIGHT;
@@ -43,8 +42,8 @@ public class LevelCompleteOverlay {
     public void draw(Canvas c){
         c.drawRect(0,0,GAME_WIDTH, GAME_HEIGHT, blackPaint);
         c.drawBitmap(LEVEL_COMPLETE_BACKGROUND.getSpriteSheet(), bgX,bgY, null);
-        MainMenu.render(c);
-        Continue.render(c);
+        MainMenu.draw(c);
+        Continue.draw(c);
     }
 
     public void touchEvents(PointF eventPos, int action, int pointerId) {

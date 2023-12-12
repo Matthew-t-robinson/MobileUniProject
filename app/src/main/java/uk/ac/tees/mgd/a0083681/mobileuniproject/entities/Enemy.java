@@ -3,6 +3,7 @@ package uk.ac.tees.mgd.a0083681.mobileuniproject.entities;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.*;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.Directions.*;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.EnemyConstants.*;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.SFXConstants.*;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.CanMoveHere;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.GetEntityYPosUnderRoofOrAboveFloor;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.IsEntityOnFloor;
@@ -12,20 +13,23 @@ import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.IsSig
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
+import uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates.BaseState;
+import uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates.Playing;
+import uk.ac.tees.mgd.a0083681.mobileuniproject.Sound.AudioManager;
+
 public abstract class Enemy extends Character {
     protected int enemyType;
-    protected int aniSpeed = 8;
     protected float fallSpeed;
-    protected float gravity = 0.2f * GAME_SCALE;
     protected int walkDir = LEFT;
     protected int tileY;
     protected float attackDistance = TILES_SIZE;
     protected boolean active = true;
     protected boolean stunned = false;
     protected int attackBoxOffsetX;
+    protected AudioManager audioManager = new AudioManager();
 
-    public Enemy(float x, float y, int Height, int Width, int enemyType) {
-        super(x, y, Height, Width, enemyType);
+    public Enemy(float x, float y, int enemyType) {
+        super(x, y, enemyType);
         this.enemyType = enemyType;
     }
 
@@ -39,7 +43,7 @@ public abstract class Enemy extends Character {
         if (CanMoveHere(hitbox.left,hitbox.top + fallSpeed,hitbox.width(),hitbox.height(),lvlData)) {
             hitbox.top += fallSpeed;
             hitbox.bottom += fallSpeed;
-            fallSpeed += gravity;
+            fallSpeed += GRAVITY;
         }else {
             float height = hitbox.height();
             inAir = false;
@@ -135,21 +139,21 @@ public abstract class Enemy extends Character {
         if (stunned && state != HIT)
             return;
         aniTick++;
-        if (aniTick >= aniSpeed) {
+        if (aniTick >= ANIMATION_SPEED) {
             aniTick = 0;
             aniIndex++;
             if (aniIndex >= GetSpriteAmount(enemyType, aniIndex)) {
                 aniIndex = 0;
                 switch (state){
-                    case IDLE:
-                        state = RUNNING;
-                        break;
-                    case ATTACK:
                     case HIT:
+                    case ATTACK:
                         state = IDLE;
                         break;
                     case DEAD:
                         active = false;
+                        break;
+                    case IDLE:
+                        state = RUNNING;
                         break;
                 }
             }
@@ -175,12 +179,12 @@ public abstract class Enemy extends Character {
         currentHealth -= amount;
         if (currentHealth <=0) {
             stunned = false;
+            audioManager.ToggleSoundEffect(ENEMYDIE);
             newState(DEAD);
         }
         else
             newState(HIT);
     }
-
 
     protected void checkEnemyHit(RectF attackBox, Player player) {
         if (RectF.intersects(attackBox,player.getHitbox())){

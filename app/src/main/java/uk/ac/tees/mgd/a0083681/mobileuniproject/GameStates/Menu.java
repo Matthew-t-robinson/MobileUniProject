@@ -1,81 +1,96 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates;
 
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.GAME_SCALE;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.PLAYBTN;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.QUITBTN;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.CONTROLS;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.ESCAPE;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.PLAY;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.QUIT;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.isIn;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_HEIGHT;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_WIDTH;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
+import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.ControlsOverlay;
+import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.PauseOverlay;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.CustomButton;
-import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.GameStateInterface;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.levelSpriteManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.main.Game;
 
 
-public class Menu extends BaseState implements GameStateInterface {
-
-    private Paint paint;
+public class Menu extends BaseState{
     public CustomButton btnPlay;
     public CustomButton btnQuit;
+    public CustomButton btnControls;
     private Bitmap menuButtonBackground;
-    private int menuX, menuY, menuWidth, menuHeight;
+    private int menuX, menuY;
+    public boolean ShowControlsOverlay;
+    private ControlsOverlay controlsOverlay;
 
     public Menu(Game game){
         super(game);
-        loadBackground();
-        paint = new Paint();
-        paint.setTextSize(60);
-        paint.setColor(Color.WHITE);
-        btnPlay = new CustomButton((float) ((GAME_WIDTH / 2) - (UIImages.MENU_BUTTONS.getWidth() / 2)), 150 * GAME_SCALE, PLAYBTN, UIImages.MENU_BUTTONS);
-        btnQuit = new CustomButton((float) ((GAME_WIDTH / 2) - (UIImages.MENU_BUTTONS.getWidth() / 2)), 220 * GAME_SCALE, QUITBTN, UIImages.MENU_BUTTONS);
+        loadMenuBackground();
+        initOverlays();
+        btnPlay = new CustomButton((float) ((GAME_WIDTH / 2) - (UIImages.MENU_BUTTONS.getWidth() / 2)), 120 * GAME_SCALE, PLAY, UIImages.MENU_BUTTONS);
+        btnQuit = new CustomButton((float) ((GAME_WIDTH / 2) - (UIImages.MENU_BUTTONS.getWidth() / 2)), 250 * GAME_SCALE, QUIT, UIImages.MENU_BUTTONS);
+        btnControls = new CustomButton((float) ((GAME_WIDTH / 2) - (UIImages.MENU_BUTTONS.getWidth() / 2)), GAME_HEIGHT / 2, CONTROLS, UIImages.MENU_BUTTONS);
     }
 
-    private void loadBackground() {
+    private void initOverlays() {
+        this.controlsOverlay = new ControlsOverlay(game,this);
+    }
+
+    private void loadMenuBackground() {
         menuButtonBackground = UIImages.MENU_BACKGROUND.getSpriteSheet();
-        menuWidth = (int) (menuButtonBackground.getWidth());
-        menuHeight = (int) (menuButtonBackground.getHeight());
+        int menuWidth = menuButtonBackground.getWidth();
         menuX = GAME_WIDTH / 2 - menuWidth / 2;
-        menuY = (int) (45 * 1);
-
+        menuY = 45;
     }
 
-    @Override
-    public void update(double delta) {
+    public void update() {
         updateUI();
     }
 
     private void updateUI() {
-        btnPlay.update();
-        btnQuit.update();
+        if (!ShowControlsOverlay) {
+            btnPlay.update();
+            btnQuit.update();
+            btnControls.update();
+        }
+        else {
+            controlsOverlay.update();
+        }
     }
 
-    @Override
     public void render(Canvas c) {
-        drawUI(c);
+        c.drawBitmap(levelSpriteManager.LEVEL_TILE_SPRITES.getLvlBackground(), 0,0, null);
+        if (!ShowControlsOverlay) {
+            drawUI(c);
+        }else
+            controlsOverlay.draw(c);
     }
 
     private void drawUI(Canvas c) {
-        c.drawBitmap(levelSpriteManager.LEVEL_TILE_SPRITES.getLvlBackground(), 0,0, null);
         c.drawBitmap(menuButtonBackground, menuX,menuY, null);
-        btnPlay.render(c);
-        btnQuit.render(c);
+        btnPlay.draw(c);
+        btnQuit.draw(c);
+        btnControls.draw(c);
     }
 
-    @Override
     public void touchEvents(MotionEvent event) {
         final int action = event.getActionMasked();
         final int actionIndex = event.getActionIndex();
         final int pointerId = event.getPointerId(actionIndex);
 
         final PointF eventPos = new PointF(event.getX(actionIndex), event.getY(actionIndex));
+        if (ShowControlsOverlay) {
+            controlsOverlay.touchEvents(eventPos, action, pointerId);
+            return;
+        }
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
@@ -86,6 +101,9 @@ public class Menu extends BaseState implements GameStateInterface {
                 } else if (isIn(eventPos, btnQuit)) {
                     btnQuit.setPushed(true);
                     btnQuit.setBtnPointerId(pointerId);
+                } else if (isIn(eventPos, btnControls)){
+                    btnControls.setPushed(true);
+                    btnControls.setBtnPointerId(pointerId);
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -98,6 +116,10 @@ public class Menu extends BaseState implements GameStateInterface {
                     btnQuit.setPushed(false);
                     btnQuit.setBtnPointerId(-1);
                     System.exit(0);
+                } else if (btnControls.isPushed() && pointerId == btnControls.getBtnPointerId()) {
+                    btnControls.setPushed(false);
+                    btnControls.setBtnPointerId(-1);
+                    ShowControlsOverlay = true;
                 }
                 break;
         }

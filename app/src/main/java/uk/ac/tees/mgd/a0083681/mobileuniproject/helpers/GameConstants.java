@@ -7,13 +7,26 @@ public class GameConstants {
     public static class AllConstants{
         public static final int GAME_SCALE = 3;
         public static final int TILES_SIZE = 96;
+        public static final float GRAVITY = 0.2f * GAME_SCALE;
+        public static final int ANIMATION_SPEED = 8;
+    }
+
+    public static class SFXConstants{
+        public static final int PLAYERDIE =0;
+        public static final int PLAYERATTACK =1;
+        public static final int PLAYERJUMP =2;
+        public static final int PLAYERLAND =3;
+        public static final int STUNSHAKE =4;
+        public static final int STUNATTACK =5;
+        public static final int ENEMYATTACK =6;
+        public static final int ENEMYDIE = 7;
+        public static final int CHESTOPEN = 8;
     }
 
     public static class LevelConstants{
         public static final int ONE = 0;
         public static final int TWO = 1;
         public static final int THREE = 2;
-        public static final int FOUR = 3;
     }
 
     public static class EnemyConstants {
@@ -25,13 +38,8 @@ public class GameConstants {
         public static final int HIT = 3;
         public static final int DEAD = 4;
 
-        public static final int CRAB_WIDTH = (int) (26 * GAME_SCALE);
-        public static final int CRAB_HEIGHT = (int) (19 * GAME_SCALE);
         public static int CRAB_DRAWOFFSET_X = (int) 26 * GAME_SCALE;
         public static int CRAB_DRAWOFFSET_Y = (int) 9 * GAME_SCALE;
-
-        public static final int STARFISH_WIDTH = (int) (9 * GAME_SCALE);
-        public static final int STARFISH_HEIGHT = (int) (21 * GAME_SCALE);
         public static final int STARFISH_DRAWOFFSET_X = (int) (9 * GAME_SCALE);
         public static final int STARFISH_DRAWOFFSET_Y = (int) (7 * GAME_SCALE);
 
@@ -101,15 +109,17 @@ public class GameConstants {
     }
 
     public static class ButtonConstants{
-        public static final int PLAYBTN = 0;
-        public static final int LEFTBTN = 0;
-        public static final int RIGHTBTN = 0;
-        public static final int ABTN = 0;
-        public static final int BBTN = 0;
-        public static final int QUITBTN = 2;
+        public static final int PLAY = 0;
+        public static final int LEFT = 0;
+        public static final int RIGHT = 0;
+        public static final int A = 0;
+        public static final int B = 0;
+        public static final int QUIT = 2;
         public static final int BACKTOMAINMENU = 2;
         public static final int RESTART = 1;
         public static final int UNPAUSE = 0;
+        public static final int ESCAPE = 0;
+        public static final int CONTROLS = 1;
         public static final int BUTTON_SCALE = 7;
 
     }
@@ -118,6 +128,10 @@ public class GameConstants {
 
         public static final int PLAYER_HITBOX_WIDTH = 20*GAME_SCALE;
         public static final int PLAYER_HITBOX_HEIGHT = 27*GAME_SCALE;
+        public static final int PLAYER_ATTACKBOX_OFFSET = GAME_SCALE * 10;
+
+        public static final float JUMP_SPEED = -10.2f * GAME_SCALE;
+        public static final float PLAYER_FALL_SPEED = 0.5f * GAME_SCALE;
 
         public static final int PLAYER = 100;
         public static final int IDLE = 0;
@@ -167,10 +181,15 @@ public class GameConstants {
         public static final int CHEST = 0;
         public static final int SPIKES = 1;
 
+        public static final int SPIKES_WIDTH = 32;
+        public static final int SPIKES_HEIGHT = 16;
+
+        public static final int CHEST_WIDTH = 64;
+        public static final int CHEST_HEIGHT = 35;
+
         public static int GetSpriteAmount(int object_type) {
-            switch (object_type) {
-                case CHEST:
-                    return 7;
+            if (object_type == CHEST) {
+                return 7;
             }
             return 1;
         }

@@ -1,5 +1,7 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.objects;
 
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.SFXConstants.CHESTOPEN;
+
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
@@ -13,7 +15,7 @@ import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.levelSpriteManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.entitySpriteManager;
 
 public class ObjectManager {
-    private Playing playing;
+    private final Playing playing;
     private final entitySpriteManager ChestSpriteManager = entitySpriteManager.CHEST;
     private final entitySpriteManager SpikeSpriteManager = entitySpriteManager.SPIKES;
     private ArrayList<Chest> Chests;
@@ -41,11 +43,17 @@ public class ObjectManager {
     public void draw(Canvas c, int xLvlOffset) {
         for (Chest currentChest : Chests) {
             c.drawBitmap(
-                    ChestSpriteManager.getSprite(0, currentChest.getAniIndex()), currentChest.getHitbox().left - xLvlOffset, currentChest.getHitbox().top, null);
+                    ChestSpriteManager.getSprite(0, currentChest.getAniIndex()),
+                    currentChest.getHitbox().left - xLvlOffset,
+                    currentChest.getHitbox().top,
+                    null);
         }
         for (Spikes s : Spikes){
             c.drawBitmap(
-                    SpikeSpriteManager.getSprite(0, s.getAniIndex()), s.getHitbox().left - xLvlOffset, s.getHitbox().top, null);
+                    SpikeSpriteManager.getSprite(0, s.getAniIndex()),
+                    s.getHitbox().left - xLvlOffset,
+                    s.getHitbox().top,
+                    null);
         }
     }
 
@@ -53,6 +61,7 @@ public class ObjectManager {
         for (Chest c : Chests)
         {
             if (RectF.intersects(c.getHitbox(),attackBox)) {
+                playing.audioManager.ToggleSoundEffect(CHESTOPEN);
                 c.setAnimation(true);
             }
         }

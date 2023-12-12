@@ -13,8 +13,6 @@ public abstract class Character {
     protected float x,y;
     protected Paint redpaint = new Paint();
 
-    protected int width, height;
-
     protected int aniIndex, aniTick;
     protected RectF hitbox, attackBox;
     protected int state;
@@ -25,19 +23,12 @@ public abstract class Character {
 
     protected boolean facingLeft;
 
-    public Character(float x, float y, int Height, int Width, int entityType){
+    public Character(float x, float y, int entityType){
         this.x = x;
         this.y = y;
-        this.width = Width;
-        this.height = Height;
         redpaint.setColor(Color.RED);
         maxHealth = GetMaxHealth(entityType);
         currentHealth = maxHealth;
-    }
-
-    public void drawHitbox(Canvas c, int xLvlOffset) {
-
-        c.drawRect(hitbox.left - xLvlOffset, hitbox.top,hitbox.right - xLvlOffset, hitbox.bottom,redpaint);
     }
 
     protected void initHitbox(float x, float y, int width, int height) {

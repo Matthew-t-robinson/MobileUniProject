@@ -24,7 +24,7 @@ public class Game {
     public void update(double delta){
         switch (currentGameState) {
             case MENU:
-                menu.update(delta);
+                menu.update();
                 break;
             case PLAYING:
                 playing.update(delta);
@@ -79,9 +79,5 @@ public class Game {
 
     public void setCurrentGameState(GameState currentGameState) {
         this.currentGameState = currentGameState;
-    }
-
-    public void resetPlayGameState(){
-        playing = new Playing(this);
     }
 }

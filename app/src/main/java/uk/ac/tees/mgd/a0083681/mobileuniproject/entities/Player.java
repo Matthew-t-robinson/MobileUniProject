@@ -1,6 +1,7 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.entities;
 
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.PlayerConstants.*;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.SFXConstants.*;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.*;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.*;
 
@@ -12,7 +13,6 @@ import uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates.Playing;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.BitmapMethods;
 
 public class Player extends Character {
-    private int aniSpeed = 10;
     private boolean moving = false, attacking = false;
     private boolean left, right, jump;
     private int[][] lvlData;
@@ -20,17 +20,14 @@ public class Player extends Character {
     public float xDrawOffset = 21 * GAME_SCALE;
     public float yDrawOffset = 4 * GAME_SCALE;
 
-    private float airSpeed = 0f;
-    private float gravity = 0.2f * GAME_SCALE;
-    private float jumpSpeed = -10.2f * GAME_SCALE;
-    private final float fallSpeedAfterCollision = 0.5f * GAME_SCALE;
+    private float airSpeed;
     private boolean jumpingAnim;
     private boolean attackChecked;
-    private Playing playing;
+    private final Playing playing;
     public boolean shakeAttacking;
 
-    public Player(float x, float y, int height, int width, Playing playing) {
-        super(x, y, height, width, 100);
+    public Player(float x, float y, Playing playing) {
+        super(x, y, 100);
         this.playing = playing;
         initHitbox(x,y,PLAYER_HITBOX_WIDTH,PLAYER_HITBOX_HEIGHT);
         initAttackbox(x,y,PLAYER_HITBOX_WIDTH,PLAYER_HITBOX_WIDTH);
@@ -53,6 +50,7 @@ public class Player extends Character {
     private void checkAttack() {
         if (attackChecked || aniIndex != 1)
             return;
+        playing.audioManager.ToggleSoundEffect(PLAYERATTACK);
         attackChecked = true;
         playing.checkEnemyHit(attackBox);
         playing.checkObjectHit(attackBox);
@@ -60,10 +58,10 @@ public class Player extends Character {
 
     private void updateAttackBox() {
         if(right){
-            attackBox.left = hitbox.right + (int)(GAME_SCALE * 10);
+            attackBox.left = hitbox.right + (GAME_SCALE * 10);
             attackBox.right = attackBox.left + (20*GAME_SCALE);
         } else if (left) {
-            attackBox.left = hitbox.left - hitbox.width() - (int)(GAME_SCALE * 10);
+            attackBox.left = hitbox.left - hitbox.width() - (GAME_SCALE * 10);
             attackBox.right = attackBox.left + (20*GAME_SCALE);
         }
         attackBox.top = hitbox.top + (GAME_SCALE * 10);
@@ -72,7 +70,7 @@ public class Player extends Character {
 
     private void updateAnimation(){
         aniTick++;
-        if (aniTick >= aniSpeed) {
+        if (aniTick >= ANIMATION_SPEED) {
             aniTick = 0;
             aniIndex++;
             if (aniIndex >= GetSpriteAmount(state) && !jumpingAnim) {
@@ -116,7 +114,7 @@ public class Player extends Character {
             if (CanMoveHere(hitbox.left,hitbox.top + airSpeed, hitbox.width(), hitbox.height(), lvlData)){
                 hitbox.top += airSpeed;
                 hitbox.bottom += airSpeed;
-                airSpeed += gravity;
+                airSpeed += GRAVITY;
                 float maxAirSpeed = 16;
                 float minAirSpeed = -16;
                 if (airSpeed < minAirSpeed)
@@ -136,11 +134,12 @@ public class Player extends Character {
 
                 hitbox.bottom = hitbox.top + height;
                 if (airSpeed > 0){
+                    playing.audioManager.ToggleSoundEffect(PLAYERLAND);
                     resetInAir();
                     jump = false;
                 }
                 else {
-                    airSpeed = fallSpeedAfterCollision;
+                    airSpeed = PLAYER_FALL_SPEED;
                 }
             }
         }else{
@@ -153,21 +152,16 @@ public class Player extends Character {
         playing.checkSpikesTouched(this);
     }
 
-    public void render(Canvas c, int xLvlOffset){
-        //drawHitbox(c, xLvlOffset);
-        //drawAttackBox(c,xLvlOffset);
+    public void draw(Canvas c, int xLvlOffset){
         c.drawBitmap(BitmapMethods.createFlippedBitmap(entitySpriteManager.PLAYER.getSprite(getState(), getAniIndex()), isFacingLeft(), false), getHitbox().left - xDrawOffset - xLvlOffset,getHitbox().top - yDrawOffset, null);
-    }
-
-    private void drawAttackBox(Canvas c, int xLvlOffset) {
-        c.drawRect(attackBox.left - xLvlOffset, attackBox.top,attackBox.right - xLvlOffset, attackBox.bottom,redpaint);
     }
 
     private void jump() {
         if (inAir)
             return;
+        playing.audioManager.ToggleSoundEffect(JUMP);
         inAir = true;
-        airSpeed = jumpSpeed;
+        airSpeed = JUMP_SPEED;
     }
 
     private void resetInAir() {
@@ -210,13 +204,15 @@ public class Player extends Character {
         if (attacking) {
             state = ATTACK_1;
         }
-        if (currentHealth == 0)
+        if (currentHealth == 0) {
             state = DEAD_GROUND;
+        }
         if (shakeAttacking){
             state = SHAKE_ATTACK;
         }
 
         if (state != currentAnim) {
+           // playing.audioManager.ToggleSoundEffect(PLAYERMOVING, false);
             resetAnim();
         }
     }
@@ -269,6 +265,7 @@ public class Player extends Character {
     public void changeHealth(int value) {
         currentHealth += value;
         if (currentHealth <= 0){
+            playing.audioManager.ToggleSoundEffect(PLAYERDIE);
             currentHealth = 0;
             setAttacking(false);
             setJump(false);

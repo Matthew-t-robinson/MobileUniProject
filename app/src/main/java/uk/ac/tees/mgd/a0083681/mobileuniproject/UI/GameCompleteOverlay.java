@@ -19,7 +19,7 @@ public class GameCompleteOverlay {
     private final CustomButton MainMenu, Restart;
     private final Game game;
     private final Playing playing;
-    private Paint blackPaint = new Paint();
+    private final Paint blackPaint = new Paint();
 
     public GameCompleteOverlay(Game game, Playing playing) {
         this.game = game;
@@ -39,8 +39,8 @@ public class GameCompleteOverlay {
     public void draw(Canvas c){
         c.drawRect(0,0,GAME_WIDTH, GAME_HEIGHT, blackPaint);
         c.drawBitmap(GAME_COMPLETE_BACKGROUND.getSpriteSheet(), bgX,bgY, null);
-        MainMenu.render(c);
-        Restart.render(c);
+        MainMenu.draw(c);
+        Restart.draw(c);
     }
 
     public void touchEvents(PointF eventPos, int action, int pointerId) {

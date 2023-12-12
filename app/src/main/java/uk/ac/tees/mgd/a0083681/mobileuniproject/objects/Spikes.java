@@ -6,10 +6,6 @@ public class Spikes extends GameObject{
     public Spikes(int x, int y) {
         super(x, y, SPIKES);
 
-        initHitbox(32, 16);
-        xDrawOffset = 0;
-        yDrawOffset = 0;
-        hitbox.top += yDrawOffset;
-
+        initHitbox(SPIKES_WIDTH, SPIKES_HEIGHT);
     }
 }

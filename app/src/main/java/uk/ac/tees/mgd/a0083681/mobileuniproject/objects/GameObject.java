@@ -1,5 +1,6 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.objects;
 
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.ANIMATION_SPEED;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.GAME_SCALE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ObjectConstants.*;
 
@@ -12,16 +13,14 @@ public class GameObject {
     protected int x, y, objType;
     protected RectF hitbox;
     protected boolean doAnimation, animationDone;
-    protected int aniTick,aniSpeed = 10;
+    protected int aniTick;
     protected int aniIndex;
     protected int xDrawOffset, yDrawOffset;
-    protected Paint redpaint = new Paint();
 
     public GameObject(int x, int y, int objType){
         this.x = x;
         this.y = y;
         this.objType = objType;
-        redpaint.setColor(Color.RED);
     }
 
     public void update(){
@@ -33,13 +32,9 @@ public class GameObject {
         hitbox = new RectF(x,y,x + (width * GAME_SCALE),y + (height * GAME_SCALE));
     }
 
-    public void drawHitbox(Canvas c, int xLvlOffset) {
-        c.drawRect(hitbox.left - xLvlOffset, hitbox.top,hitbox.right - xLvlOffset, hitbox.bottom,redpaint);
-    }
-
     protected void updateAnimationTick() {
         aniTick++;
-        if (aniTick >= aniSpeed) {
+        if (aniTick >= ANIMATION_SPEED) {
             aniTick = 0;
             aniIndex++;
             if (aniIndex >= GetSpriteAmount(objType)) {
@@ -58,23 +53,7 @@ public class GameObject {
         aniIndex = 0;
         aniTick = 0;
         animationDone = false;
-
-        if (objType == CHEST)
-            doAnimation = false;
-        else
-            doAnimation = true;
-    }
-
-    public int getxDrawOffset() {
-        return xDrawOffset;
-    }
-
-    public int getyDrawOffset() {
-        return yDrawOffset;
-    }
-
-    public int getObjType() {
-        return objType;
+        doAnimation = objType != CHEST;
     }
 
     public RectF getHitbox() {

@@ -1,15 +1,12 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.helpers;
 
-import static android.content.Context.TELECOM_SERVICE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.TILES_SIZE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_HEIGHT;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.GAME_WIDTH;
 
 import android.graphics.PointF;
 import android.graphics.RectF;
 
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.CustomButton;
-import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.Player;
 
 public class HelpMethods {
     public static boolean CanMoveHere(float x, float y, float width, float height, int [][] lvlData){
@@ -89,7 +86,7 @@ public class HelpMethods {
             return IsSolid(hitbox.left + xSpeed, hitbox.top + hitbox.height(), lvlData);
     }
 
-    public static boolean IsAllTilesWalkable(int xStart, int xEnd, int y, int [][] lvlData) {
+    public static boolean AreAllTilesWalkable(int xStart, int xEnd, int y, int [][] lvlData) {
         for (int i = 0; i < xEnd - xStart; i++) {
             if (IsTileSolid(xStart + i, y, lvlData))
                 return false;
@@ -103,8 +100,8 @@ public class HelpMethods {
         int firstXTile = (int)hitbox.left / TILES_SIZE;
         int secondXTile = (int)hitbox2.left / TILES_SIZE;
         if (firstXTile > secondXTile)
-            return IsAllTilesWalkable(secondXTile,firstXTile,yTile,lvlData);
+            return AreAllTilesWalkable(secondXTile,firstXTile,yTile,lvlData);
         else
-            return IsAllTilesWalkable(firstXTile,secondXTile,yTile,lvlData);
+            return AreAllTilesWalkable(firstXTile,secondXTile,yTile,lvlData);
     }
 }

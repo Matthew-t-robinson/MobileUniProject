@@ -10,10 +10,11 @@ import java.util.ArrayList;
 
 import uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates.Playing;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.BitmapMethods;
+import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.levelManager;
 
 public class EnemyManager {
 
-    private Playing playing;
+    private final Playing playing;
     private final entitySpriteManager Crab;
     private final entitySpriteManager Starfish;
     private ArrayList<Crab> crabs = new ArrayList<>();
@@ -29,19 +30,19 @@ public class EnemyManager {
     }
 
     public void addEnemies() {
-        crabs = playing.getLvlManager().currentLevel.getLevel().getCrabsList();
-        starfish = playing.getLvlManager().currentLevel.getLevel().getStarfishList();
+        crabs = levelManager.currentLevel.getLevel().getCrabsList();
+        starfish = levelManager.currentLevel.getLevel().getStarfishList();
         //System.out.println("Size of crabs:" + crabs.size());
     }
 
     public void Update(double delta, Player player){
         for (Crab c : crabs){
             if (c.isActive())
-                c.update(playing.getLvlManager().getCurrentLevel().getLvlData(), delta, player);
+                c.update(levelManager.getCurrentLevel().getLvlData(), delta, player);
         }
         for (Starfish s : starfish){
             if (s.isActive())
-                s.update(playing.getLvlManager().getCurrentLevel().getLvlData(), delta, player);
+                s.update(levelManager.getCurrentLevel().getLvlData(), delta, player);
         }
     }
     

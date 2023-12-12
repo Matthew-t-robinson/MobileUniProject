@@ -42,9 +42,9 @@ public class PauseOverlay {
     public void draw(Canvas c){
         c.drawRect(0,0,GAME_WIDTH, GAME_HEIGHT, blackPaint);
         c.drawBitmap(PAUSE_BACKGROUND.getSpriteSheet(), bgX,bgY, null);
-        MainMenu.render(c);
-        Restart.render(c);
-        Unpause.render(c);
+        MainMenu.draw(c);
+        Restart.draw(c);
+        Unpause.draw(c);
     }
 
     public void touchEvents(PointF eventPos, int action, int pointerId) {

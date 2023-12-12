@@ -1,10 +1,10 @@
 package uk.ac.tees.mgd.a0083681.mobileuniproject.GameStates;
 
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages.HUD_HEALTH_BAR;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.TILES_SIZE;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.*;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.ButtonConstants.*;
+import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.SFXConstants.*;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity.*;
-import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants.AllConstants.GAME_SCALE;
 import static uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.HelpMethods.*;
 
 import android.graphics.Canvas;
@@ -17,10 +17,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.MotionEvent;
-import android.widget.Toast;
 
 import java.util.Objects;
-import java.util.Random;
 
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.GameCompleteOverlay;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.GameOverOverlay;
@@ -30,46 +28,38 @@ import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.UIImages;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.UI.CustomButton;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.EnemyManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.Player;
-import uk.ac.tees.mgd.a0083681.mobileuniproject.entities.entitySpriteManager;
-import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.GameConstants;
-import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.BitmapMethods;
-import uk.ac.tees.mgd.a0083681.mobileuniproject.helpers.Interfaces.GameStateInterface;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.levels.levelManager;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.main.Game;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.main.MainActivity;
 import uk.ac.tees.mgd.a0083681.mobileuniproject.objects.ObjectManager;
 
-public class Playing extends BaseState implements GameStateInterface, BitmapMethods {
+public class Playing extends BaseState{
     private final levelManager lvlManager;
     private final EnemyManager enemyManager;
-    private SensorManager sensorManager;
     private final ObjectManager objectManager;
     private final Player player;
     public CustomButton btnLeft,btnRight,btnA,btnB,btnPause;
-
     private int xLvlOffset;
-    private final int leftBorder = (int) (0.2 * GAME_WIDTH);
-    private final int rightBorder = (int) (0.8 * GAME_WIDTH);
-    private int lvlTilesWide;
-    private int maxTilesOffset;
+    private final int leftScreenEdge = (int) (0.2 * GAME_WIDTH);
+    private final int rightScreenEdge = (int) (0.8 * GAME_WIDTH);
     private int maxLvlOffsetX;
     private float mAccel;
     private float mAccelCurrent;
     private float mAccelLast;
-    private int healthBarSpriteX = (int) (10 * GAME_SCALE);
-    private int healthBarSpriteY = (int) (10 * GAME_SCALE);
-    private final int healthBarWidth = (int) (150 * GAME_SCALE);
-    private int healthBarHeight = (int) (4 * GAME_SCALE);
-    private int healthBarXStart = (int) (34 * GAME_SCALE);
-    private int healthBarYStart = (int) (14 * GAME_SCALE);
+    private final int healthBarSpriteX = 10 * GAME_SCALE;
+    private final int healthBarSpriteY = 10 * GAME_SCALE;
+    private final int healthBarWidth = 150 * GAME_SCALE;
+    private final int healthBarHeight = 4 * GAME_SCALE;
+    private final int healthBarXStart = 34 * GAME_SCALE;
+    private final int healthBarYStart = 14 * GAME_SCALE;
     private int healthWidth = healthBarWidth;
-    private Paint redpaint = new Paint();
+    private final Paint redpaint = new Paint();
     private PauseOverlay pauseOverlay;
     private GameOverOverlay gameOverOverlay;
     private LevelCompleteOverlay levelCompleteOverlay;
     private GameCompleteOverlay gameCompleteOverlay;
-    private boolean paused = false;
-    private boolean GameOver = false;
+    private boolean paused;
+    private boolean GameOver;
     private boolean LevelCompleted;
     private boolean GameCompleted;
 
@@ -80,7 +70,7 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
         lvlManager = new levelManager(this,game);
         enemyManager = new EnemyManager(this);
         PointF playerSpawn = levelManager.getCurrentLevel().getLevel().getPlayerStartPos();
-        player = new Player(playerSpawn.x,playerSpawn.y, 40 * GAME_SCALE, 64 * GAME_SCALE, this);
+        player = new Player(playerSpawn.x,playerSpawn.y, this);
         player.loadLvlData(levelManager.getCurrentLevel().getLvlData());
         objectManager = new ObjectManager(this);
         redpaint.setColor(Color.RED);
@@ -91,15 +81,15 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
     }
 
     public void calcLvlOffset() {
-        lvlTilesWide = levelManager.getCurrentLevel().getLvlData()[0].length;
-        maxTilesOffset = lvlTilesWide - 25;
+        int lvlTilesWide = levelManager.getCurrentLevel().getLvlData()[0].length;
+        int maxTilesOffset = lvlTilesWide - 25;
         maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
     }
 
     private void initSensorManager() {
-        this.sensorManager = MainActivity.mSensorManager;
+        SensorManager sensorManager = MainActivity.mSensorManager;
 
-        Objects.requireNonNull(this.sensorManager).registerListener(mSensorListener, this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+        Objects.requireNonNull(sensorManager).registerListener(mSensorListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
         mAccel = 10f;
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
@@ -107,11 +97,11 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
     }
 
     private void initButtons() {
-        btnLeft = new CustomButton(150, 800, LEFTBTN, UIImages.HUD_BUTTON_LEFT);
-        btnRight = new CustomButton(150 + UIImages.HUD_BUTTON_LEFT.getWidth() + 100, 800, RIGHTBTN , UIImages.HUD_BUTTON_RIGHT);
-        btnA = new CustomButton(MainActivity.GAME_WIDTH - (150 + UIImages.HUD_BUTTON_A.getWidth()), 800, ABTN, UIImages.HUD_BUTTON_A);
-        btnB = new CustomButton(MainActivity.GAME_WIDTH - (150 + (UIImages.HUD_BUTTON_A.getWidth() * 2) + 100), 800, BBTN, UIImages.HUD_BUTTON_B);
-        btnPause = new CustomButton(MainActivity.GAME_WIDTH - (42 + (UIImages.HUD_BUTTON_PAUSE.getWidth())), 42, BBTN, UIImages.HUD_BUTTON_PAUSE);
+        btnLeft = new CustomButton(150, 800, LEFT, UIImages.HUD_BUTTON_LEFT);
+        btnRight = new CustomButton(150 + UIImages.HUD_BUTTON_LEFT.getWidth() + 100, 800, RIGHT, UIImages.HUD_BUTTON_RIGHT);
+        btnA = new CustomButton(MainActivity.GAME_WIDTH - (150 + UIImages.HUD_BUTTON_A.getWidth()), 800, A, UIImages.HUD_BUTTON_A);
+        btnB = new CustomButton(MainActivity.GAME_WIDTH - (150 + (UIImages.HUD_BUTTON_A.getWidth() * 2) + 100), 800, B, UIImages.HUD_BUTTON_B);
+        btnPause = new CustomButton(MainActivity.GAME_WIDTH - (42 + (UIImages.HUD_BUTTON_PAUSE.getWidth())), 42, B, UIImages.HUD_BUTTON_PAUSE);
     }
     private void initOverlays() {
         this.pauseOverlay = new PauseOverlay(game,this);
@@ -120,7 +110,7 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
         this.gameCompleteOverlay = new GameCompleteOverlay(game,this);
     }
 
-    @Override
+    //@Override
     public void update(double delta) {
         if (paused){
             pauseOverlay.update();
@@ -134,21 +124,21 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
             objectManager.update();
         } else {
             player.update(delta);
-            checkCloseToBorder();
+            checkCloseToScreenEdge();
             enemyManager.Update(delta, player);
             objectManager.update();
             updateUI();
         }
     }
 
-    private void checkCloseToBorder() {
+    private void checkCloseToScreenEdge() {
         int playerX = (int) player.getHitbox().left;
         int diff = playerX - xLvlOffset;
 
-        if (diff > rightBorder)
-            xLvlOffset +=diff - rightBorder;
-        else if (diff < leftBorder)
-            xLvlOffset += diff - leftBorder;
+        if (diff > rightScreenEdge)
+            xLvlOffset +=diff - rightScreenEdge;
+        else if (diff < leftScreenEdge)
+            xLvlOffset += diff - leftScreenEdge;
         if (xLvlOffset > maxLvlOffsetX)
             xLvlOffset = maxLvlOffsetX;
         else if (xLvlOffset < 0)
@@ -168,12 +158,12 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
         healthWidth = (int) ((player.getCurrentHealth() / (float) player.getMaxHealth()) * healthBarWidth);
     }
 
-    @Override
+    //@Override
     public void render(Canvas c) {
         lvlManager.draw(c, xLvlOffset);
         enemyManager.draw(c, xLvlOffset);
         objectManager.draw(c, xLvlOffset);
-        player.render(c, xLvlOffset);
+        player.draw(c, xLvlOffset);
         drawUI(c);
     }
 
@@ -187,11 +177,11 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
         } else if (GameCompleted) {
             gameCompleteOverlay.draw(c);
         }else {
-            btnLeft.render(c);
-            btnRight.render(c);
-            btnA.render(c);
-            btnB.render(c);
-            btnPause.render(c);
+            btnLeft.draw(c);
+            btnRight.draw(c);
+            btnA.draw(c);
+            btnB.draw(c);
+            btnPause.draw(c);
             drawHealthBar(c);
         }
     }
@@ -206,7 +196,7 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
         c.drawRect(healthBarXStart + healthBarSpriteX, healthBarYStart + healthBarSpriteY, healthBarXStart + healthBarSpriteX + healthWidth,healthBarYStart + healthBarSpriteY + healthBarHeight, redpaint);
     }
 
-    @Override
+    //@Override
     public void touchEvents(MotionEvent event) {
         final int action = event.getActionMasked();
         final int actionIndex = event.getActionIndex();
@@ -303,10 +293,14 @@ public class Playing extends BaseState implements GameStateInterface, BitmapMeth
             mAccel = mAccel * 0.9f + delta;
             if (mAccel > 5) {
                 if (Game.getCurrentGameState() == Game.GameState.PLAYING)
-                    if (enemyManager.canShakeAttackHit(player))
+                    if (enemyManager.canShakeAttackHit(player)) {
                         player.setShakeAttacking(true);
-                    else
+                        audioManager.ToggleSoundEffect(STUNATTACK);
+                    }
+                    else {
+                        audioManager.ToggleSoundEffect(STUNSHAKE);
                         enemyManager.stunTimer();
+                    }
             }
         }
 
